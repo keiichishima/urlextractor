@@ -77,7 +77,7 @@ parse_options(int argc, char **argv) {
 
 static void
 show_usage() {
-  printf("urlextractor -i ifname\n");
+  printf("urlextractor -i ifname [-f filter_exp] [-s snaplen]\n");
 }
 
 static pcap_t *
