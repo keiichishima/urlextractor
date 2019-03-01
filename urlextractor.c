@@ -87,12 +87,14 @@ pcap_setup(struct options *options) {
   struct bpf_program fp;
   char errbuf[PCAP_ERRBUF_SIZE];
 
+#if 0
   /* open pcap handle */
   if (pcap_lookupnet(options->ifname, &net, &mask, errbuf) == -1) {
     fprintf(stderr, "Couldn't get netmask for device %s: %s\n",
 	    options->ifname, errbuf);
     return NULL;
   }
+#endif
   handle = pcap_open_live(options->ifname, options->snaplen, 1,
 			  1000, errbuf);
   if (handle == NULL) {
