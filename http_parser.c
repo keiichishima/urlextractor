@@ -39,6 +39,26 @@
 struct sniff_ethernet {
   u_int8_t dst[6];
   u_int8_t src[6];
+  /* type follows */
+};
+
+struct sniff_ethernet_q {
+  u_int8_t dst[6];
+  u_int8_t src[6];
+  u_int16_t tag;
+  /* type follows */
+};
+
+struct sniff_ethernet_qinq {
+  u_int8_t dst[6];
+  u_int8_t src[6];
+  u_int16_t tag1;
+  u_int16_t tag2;
+  /* type follows */
+};
+
+struct sniff_ethernet_type {
+  /* ethernet header */
   u_int16_t type;
 };
 
@@ -82,22 +102,34 @@ struct sniff_tcp {
 void
 http_parser(u_char *user, const struct pcap_pkthdr *pkthdr,
 	    const u_char *pkt) {
-  struct sniff_ethernet *eh = (struct sniff_ethernet *)pkt;
+  struct sniff_ethernet_type *et = (struct sniff_ethernet_type *)(pkt + 12);
   struct sniff_tcp *tcp;
   char ip_src[40], ip_dst[40];
 
+  /* skip VLAN tags */
+  if (ntohs(et->type) == 0x8100) {
+    et = (struct sniff_ethernet_type *)(pkt
+					+ sizeof(struct sniff_ethernet_q));
+  } else if (ntohs(et->type) == 0x88a8) {
+    et = (struct sniff_ethernet_type *)(pkt
+					+ sizeof(struct sniff_ethernet_qinq));
+  } else {
+    et = (struct sniff_ethernet_type *)(pkt
+					+ sizeof(struct sniff_ethernet));
+  }
+
   /* parse network protocol headers and get a pointer to TCP header */
-  if (ntohs(eh->type) == 0x0800) {
+  if (ntohs(et->type) == 0x0800) {
     /* IPv4 */
-    struct sniff_ip4 *ip4 = (struct sniff_ip4 *)(eh + 1);
+    struct sniff_ip4 *ip4 = (struct sniff_ip4 *)(et + 1);
     u_int ip4_hlen = (ip4->vhl & 0x0f) << 2;
     /* get src and dst addresses in strings */
     inet_ntop(AF_INET, (const void *)&ip4->src, ip_src, sizeof(ip_src));
     inet_ntop(AF_INET, (const void *)&ip4->dst, ip_dst, sizeof(ip_dst));
     tcp = (struct sniff_tcp *)((u_char *)ip4 + ip4_hlen);
-  } else if (ntohs(eh->type) == 0x86dd) {
+  } else if (ntohs(et->type) == 0x86dd) {
     /* IPv6 */
-    struct sniff_ip6 *ip6 = (struct sniff_ip6 *)(eh + 1);
+    struct sniff_ip6 *ip6 = (struct sniff_ip6 *)(et + 1);
     u_int ip6_hlen = sizeof(struct sniff_ip6);
     /* get src and dst addresses in strings */
     inet_ntop(AF_INET6, (const void *)&ip6->src, ip_src, sizeof(ip_src));
