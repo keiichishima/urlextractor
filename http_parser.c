@@ -185,4 +185,5 @@ http_parser(u_char *user, const struct pcap_pkthdr *pkthdr,
     printf("%s %s %.*s:%.*s\n", ip_src, ip_dst,
 	   host_len, host, (int)path_len, path);
   }
+  fflush(stdout);
 }
