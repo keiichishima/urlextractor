@@ -45,15 +45,18 @@ struct sniff_ethernet {
 struct sniff_ethernet_q {
   u_int8_t dst[6];
   u_int8_t src[6];
-  u_int16_t tag;
+  u_int16_t tpid;
+  u_int16_t tci;
   /* type follows */
 };
 
 struct sniff_ethernet_qinq {
   u_int8_t dst[6];
   u_int8_t src[6];
-  u_int16_t tag1;
-  u_int16_t tag2;
+  u_int16_t tpid1;
+  u_int16_t tci1;
+  u_int16_t tpid2;
+  u_int16_t tci2;
   /* type follows */
 };
 
