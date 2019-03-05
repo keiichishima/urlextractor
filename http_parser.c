@@ -182,10 +182,10 @@ http_parser(u_char *user, const struct pcap_pkthdr *pkthdr,
   }
 
   if (host == NULL) {
-    printf("%s %s %s:%.*s\n", ip_src, ip_dst,
+    printf("%s %s %s%.*s\n", ip_src, ip_dst,
 	   ip_dst, (int)path_len, path);
   } else {
-    printf("%s %s %.*s:%.*s\n", ip_src, ip_dst,
+    printf("%s %s %.*s%.*s\n", ip_src, ip_dst,
 	   host_len, host, (int)path_len, path);
   }
   fflush(stdout);
